@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: v1-invest-intel
+  ai:
+    openai:
+      # 密钥与地址只从环境变量读取，绝不硬编码
+      api-key: ${SPRING_AI_OPENAI_API_KEY:}
+      base-url: ${SPRING_AI_OPENAI_BASE_URL:https://open.bigmodel.cn/api/paas/v4}
+      chat:
+        options:
+          model: ${SPRING_AI_OPENAI_MODEL:glm-4.5-flash}
+          temperature: 0.3
+
+app:
+  # 抓取与存储配置（本地文件，无需数据库）
+  fetch:
+    timeout-seconds: 8
+    max-articles: 4
+    fresh-days: 7
+  storage:
+    output-dir: output
+    trace-file: logs/trace.jsonl
+
+logging:
+  level:
+    root: INFO

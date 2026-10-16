@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>投研情报 Agent · 演示终端</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0d1117;font-family:"SF Mono",Menlo,monospace;height:100vh;overflow:hidden}
+  #term{height:100vh;padding:28px 34px;font-size:15.5px;line-height:1.62;color:#c9d1d9}
+  .bar{display:flex;gap:8px;padding:12px 16px;background:#161b22;border-bottom:1px solid #30363d;position:sticky;top:0}
+  .dot{width:12px;height:12px;border-radius:50%}
+  .t{color:#58a6ff}.p{color:#7ee787}.w{color:#d2a8ff}.c{color:#6e7681;font-style:italic}
+  .y{color:#f0883e}.g{color:#7ee787}.r{color:#ff7b72}.b{color:#79c0ff}
+  .hdr{color:#58a6ff;font-weight:700}
+  .cur{display:inline-block;width:9px;height:17px;background:#c9d1d9;vertical-align:-3px;animation:bl 1.05s steps(2) infinite}
+  @keyframes bl{0%,49.9%{opacity:1}50.1%,100.1%{opacity:0}}
+  .slide{display:none}
+  .slide.on{display:block}
+  .divider{height:1px;background:#30363d;margin:14px 0}
+  .tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12.5px;margin-right:6px}
+  .t-up{background:rgba(248,81,73,.15);color:#ff7b72}
+  .t-neu{background:rgba(210,168,255,.15);color:#d2a8ff}
+  .card{border-left:3px solid #58a6ff;padding:8px 14px;margin:8px 0;background:#161b22;border-radius:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span style="color:#6e7681;font-size:12.5px;margin-left:10px">~/agent-demos · 投研情报 Agent v1.0 演示</span></div>
+<div id="term"></div>
+<script>
+const S=[],W=(s,cls)=>s.split('\n').map(l=>`<span class="${cls||''}">${l||' '}</span>`).join('\n');
+// S1 痛点
+S.push({t:1800,html:`<div class="hdr">【问题】券商研究员每天在多个平台手工汇总公开资讯</div><div class="divider"></div>
+<span class="c"># 现状</span>
+<span class="r">✗</span> 8 名分析师各自复制粘贴，格式口径不统一
+<span class="r">✗</span> 人工难以稳定保证每日 <span class="b">8:30</span> 前出具
+<span class="r">✗</span> 缺统一护栏与留痕，难以审计追溯
+
+<div class="divider"></div>
+<span class="c"># 目标：把「每日汇总」变成一条可审计的自动化流水线</span>`});
+// S2 架构
+S.push({t:2400,html:`<div class="hdr">【方案】四节点流水线 + 三层合规护栏</div><div class="divider"></div>
+<span class="t">① 抓取 Fetch</span>   <span class="c">3 个公开 RSS 信源 · 近 7 日新鲜度过滤 · 去重</span>
+<span class="w">        ↓</span>
+<span class="t">② 清洗 Clean</span>   <span class="c">XML 解析 → 结构化字段（标题/来源/时间/链接）</span>
+<span class="w">        ↓</span>
+<span class="t">③ 摘要 Summarize</span> <span class="c">大模型打标（利好/中性/利空）+ 生成摘要</span>
+<span class="w">        ↓</span>
+<span class="t">④ 推送 Publish</span>  <span class="c">落盘 Markdown 简报 + 写入 trace 日志</span>
+
+<div class="divider"></div>
+<span class="hdr">合规护栏（不可关闭）</span>
+<span class="g">✓</span> 高危词扫描（54 词表）→ <span class="g">零命中</span>
+<span class="g">✓</span> 末尾强制附免责声明
+<span class="g">✓</span> 数字类结论由程序计算，模型仅做文字解读`});
+// S3 实跑
+S.push({t:2600,html:`<div class="hdr">【实跑】启动服务并触发一次完整流程</div><div class="divider"></div>
+<span class="p">cuiyaohan</span>@<span class="t">invest-intel</span> <span class="p">%</span> mvn spring-boot:run -q
+<span class="c">...</span>Started InvestIntelApplication in 3.214 seconds
+
+<span class="p">cuiyaohan</span>@<span class="t">invest-intel</span> <span class="p">%</span> curl -X POST localhost:8080/run
+<span class="y">⏱</span> 抓取中 <span class="c">中新网·要闻 / 财经 / 科技</span> ...
+<span class="g">✓</span> 信源 1/3 中新网·要闻 <span class="c">→ 8 条</span>
+<span class="g">✓</span> 信源 2/3 中新网·财经 <span class="c">→ 11 条</span>
+<span class="g">✓</span> 信源 3/3 中新网·科技 <span class="c">→ 6 条</span>
+<span class="y">⏱</span> 新鲜度过滤（近 7 日）<span class="c">→ 保留 4 条</span>
+<span class="y">⏱</span> 模型摘要打标 <span class="c">→ 1 条限流降级为规则摘录</span>
+<span class="g">✓</span> 高危词扫描 <span class="c">→ 0 命中</span>
+<span class="g">✓</span> 免责声明已追加
+<span class="g">✓</span> 已写入 <span class="b">output/brief_20261016.md</span>  ·  trace.jsonl 已记录`});
+// S4 产物
+S.push({t:2600,html:`<div class="hdr">【产物】每日简报 · 2026-10-16</div><div class="divider"></div>
+<span class="c">投研情报简报 · 2026-10-16</span>
+<span class="c">信源 3 个 · 条目 4 条</span>
+
+<div class="hdr" style="margin-top:10px">一、今日要点</div>
+<div class="card"><span class="tag t-up">利好</span>2026年1月至9月我国发布国家标准外文版620项</div>
+<div class="card"><span class="tag t-neu">中性</span>5年430项惠青政策 黑龙江"青年朋友圈"聚力东北振兴</div>
+<div class="card"><span class="tag t-neu">中性</span>国家发展改革委等三部门完善养老服务价格政策</div>
+<div class="card"><span class="tag t-neu">中性</span>老人独自看病难？陪诊服务首项国标即将实施</div>
+
+<div class="hdr" style="margin-top:12px">二、分条摘要（含来源与时间）</div>
+<span class="c">1. 来源 中新网·要闻 · 2026-10-16 14:34 · 原文链接已附</span>`});
+// S5 价值
+S.push({t:2400,html:`<div class="hdr">【价值】可量化的交付结果</div><div class="divider"></div>
+<div class="card">人工汇总 <span class="r">≈ 2 小时 / 天</span>  →  自动流水线 <span class="g">≈ 3 分钟 / 天</span></div>
+<div class="card">8 名分析师统一口径 <span class="g">✓</span>  输出格式可配置、可版本化</div>
+<div class="card">每次调用全链路留痕 <span class="g">✓</span>  trace.jsonl 可审计</div>
+<div class="card">私有化部署 <span class="g">✓</span>  JAR / Docker，数据不出内网</div>
+
+<div class="divider"></div>
+<span class="hdr">技术栈</span>
+<span class="c">Java 17 · Spring Boot 4.1.1 · Spring AI 2.0.1 · 智谱 GLM（OpenAI 兼容）</span>
+
+<div class="divider"></div>
+<span class="g">✓</span> <span class="b">本系统仅做信息整理与效率提升，不构成投资建议，仅供参考。</span>`});
+// S6 边界
+S.push({t:2200,html:`<div class="hdr">【边界】诚实说明</div><div class="divider"></div>
+<span class="g">✓</span> 已跑通：资讯抓取 → 摘要打标 → 简报落盘 → 合规护栏
+<span class="y">!</span> 局限：免费模型档并发约 1，高峰期可能触发限流（已做规则降级兜底）
+<span class="y">!</span> 局限：内部只读接口需客户方提供权限后方可接入
+<span class="r">✗</span> 不提供买卖方向、收益类表述、具体金额运算
+
+<div class="divider"></div>
+<span class="c">GitHub 作品集已开源 · 欢迎审阅源码与实测记录</span>`});
+const term=document.getElementById('term');let i=0;
+function show(){term.innerHTML=S[i].html+'<span class="cur"></span>';}
+function next(){if(i<S.length-1){i++;show();}else{term.innerHTML=S[i].html;}}
+show();const h=setInterval(next,3200);
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){clearInterval(h);next();}});
+</script>
+</body>
+</html>

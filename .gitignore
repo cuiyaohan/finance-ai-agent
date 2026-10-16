@@ -1,0 +1,46 @@
+# 密钥与本地配置（绝不进 Git）
+.env
+.env.*
+!.env.example
+application-local.yml
+application-local.properties
+*.key
+*.pem
+secrets/
+
+# 构建产物
+target/
+build/
+dist/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.tools/
+node_modules/
+*.egg-info/
+
+# 数据与日志（可能含客户信息）
+data/
+output/
+logs/
+*.log
+trace.jsonl
+*.db
+*.sqlite3
+*.sqlite
+
+# 客户商务资料与平台运营物料（仅本地保留，严禁进入公开仓库）
+# 原因：含真实报价区间、客户需求细节、议价话术；公开会同时损害
+# 客户信任与自身议价能力，并与「机构私有化定制」的对外定位冲突。
+docs/clients/
+docs/xianyu/
+docs/xhs/
+docs/GitHub建仓指引.md
+docs/真机实拍脚本.md
+
+# 编辑器与系统
+.idea/
+.vscode/
+*.iml
+.DS_Store

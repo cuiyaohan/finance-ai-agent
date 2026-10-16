@@ -1,0 +1,1 @@
+{"ts": "2026-10-16T14:55:25+08:00", "model": "glm-4.5-flash", "sources": 3, "articles": 4, "prompt_tokens": 1496, "completion_tokens": 168, "total_tokens": 1664, "elapsed_s": 22.77, "cost_yuan": 0.0012, "price_source": "price_table", "file": "brief_20261016.md", "fallback": false, "masked_words": [], "errors": []}
